@@ -14,6 +14,11 @@ public class UpdateMeasurementResource {
 
     @NotNull
     @NotBlank
+    @Min(1)
+    private Integer id;
+
+    @NotNull
+    @NotBlank
     private Double weight;
 
     private String comment;
