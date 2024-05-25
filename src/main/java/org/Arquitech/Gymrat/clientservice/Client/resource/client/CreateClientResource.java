@@ -15,4 +15,6 @@ public class CreateClientResource {
     @NotNull
     private Integer givenPlan;
 
+    private String givenStripeCardToken;
+
 }

@@ -3,7 +3,6 @@ package org.Arquitech.Gymrat.clientservice.Client.resource.goal;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Measurement;
-import org.Arquitech.Gymrat.clientservice.Client.resource.measurement.CreateMeasurementResource;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -30,6 +29,6 @@ public class CreateGoalResource {
     private Date endDate;
 
     @NotNull
-    private CreateMeasurementResource measurement;
+    private Measurement measurement;
 
 }

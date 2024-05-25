@@ -11,4 +11,5 @@ public class ClientResource {
     private Integer id;
     private Integer givenUser;
     private Integer givenPlan;
+
 }
