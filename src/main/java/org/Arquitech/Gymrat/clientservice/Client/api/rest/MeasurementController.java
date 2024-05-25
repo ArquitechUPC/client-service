@@ -78,9 +78,12 @@ public class MeasurementController {
     })
     @PutMapping("{id}")
     public ResponseEntity<MeasurementResource> update(@PathVariable Integer id, @RequestBody UpdateMeasurementResource resource){
-        if(id.equals(resource.getId())) {
+        //if(measurementService.fetchById(id).isPresent()) {
+        if(id.equals(measurementService.fetchById(id).get().getId())) {
+            Measurement aux = mapper.toModel(resource);
+            aux.setId(id);
             MeasurementResource measurementResource = mapper.toResource(
-                    measurementService.update(mapper.toModel(resource)));
+                    measurementService.update(aux));
             return new ResponseEntity<>(measurementResource, HttpStatus.OK);
         }
         else {
