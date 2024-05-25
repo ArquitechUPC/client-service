@@ -15,10 +15,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class UpdateGoalResource {
 
-    /*@NotNull
+    @NotNull
     @NotBlank
     @Min(1)
-    private Integer id;*/
+    private Integer id;
 
     @NotNull
     @NotBlank

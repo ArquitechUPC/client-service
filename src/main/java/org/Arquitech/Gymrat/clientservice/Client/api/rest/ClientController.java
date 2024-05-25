@@ -9,14 +9,15 @@ import lombok.AllArgsConstructor;
 import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Client;
 import org.Arquitech.Gymrat.clientservice.Client.domain.service.ClientService;
 import org.Arquitech.Gymrat.clientservice.Client.mapping.ClientMapper;
-import org.Arquitech.Gymrat.clientservice.Client.resource.client.*;
+import org.Arquitech.Gymrat.clientservice.Client.resource.client.ClientResource;
+import org.Arquitech.Gymrat.clientservice.Client.resource.client.CreateClientResource;
+import org.Arquitech.Gymrat.clientservice.Client.resource.client.UpdateClientResource;
 import org.Arquitech.Gymrat.clientservice.Shared.exception.CustomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "Clients", description = "Create, Read, Update and delete clients entities")
 @RestController
@@ -50,17 +51,6 @@ public class ClientController {
         return this.mapper.toResource(clientService.fetchById(id).get());
     }
 
-    //fetchByCompanyId
-    @Operation(summary = "Get all clients by CompanyId", responses = {
-            @ApiResponse(description = "Successfully fetched all clients by CompanyId",
-                    responseCode = "201",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClientResource.class)))
-    })
-    @GetMapping("/company/{companyId}")
-    public List<Client> fetchByCompanyId(@PathVariable Integer companyId) {
-        return clientService.fetchByCompanyId(companyId);
-    }
 
     @Operation(summary = "Save a client", responses = {
             @ApiResponse(description = "Client successfully created",
@@ -69,22 +59,12 @@ public class ClientController {
                             schema = @Schema(implementation = ClientResource.class)))
     })
     @PostMapping
-    public ClientResource save(@RequestBody CreateClientUserResource resource){
+    public ClientResource save(@RequestBody CreateClientResource resource){
 
-        /*if (!clientService.existUserByUserId((mapper.toModel(resource)))) {
+        if (!clientService.existUserByUserId((mapper.toModel(resource)))) {
             throw new IllegalArgumentException("User does not exist");
-        }*/
-        CreateClientResource clientResource = new CreateClientResource();
-        clientResource.setGivenUser(clientService.obtainUserId(
-                resource.getUsername(), resource.getEmail(), resource.getPassword(), resource.getGymName(),
-                resource.getPhoneNumber(), resource.getAddress(), resource.getCity()));
-        /*if(givenPlan!=null){
-
-        } else {*/
-            clientResource.setGivenPlan(1);
-        /*}*/
-
-        return this.mapper.toResource(clientService.save(this.mapper.toModel(clientResource)));
+        }
+        return this.mapper.toResource(clientService.save(this.mapper.toModel(resource)));
     }
 
     @Operation(summary = "Update a client's plan", responses = {
@@ -94,77 +74,18 @@ public class ClientController {
                             schema = @Schema(implementation = ClientResource.class)))
     })
     @PutMapping("{id}/plan/{planId}")
-    public ResponseEntity<ClientResource> updatePlan(@PathVariable Integer id, @RequestBody ClientPlanResource resource) {
+    public ResponseEntity<ClientResource> updatePlan(@PathVariable Integer id, @PathVariable Integer planId, @RequestBody UpdateClientResource resource) {
 
-        if (id.equals(clientService.fetchById(id).get().getId())) {
-            if (clientService.existPlanByPlanId(resource.getGivenPlan())) {
-                Client updatedClient = clientService.updatePlan(clientService.fetchById(id).get(), resource.getGivenPlan());
-                ClientResource clientResource = mapper.toResource(updatedClient);
-                return new ResponseEntity<>(clientResource, HttpStatus.OK);
-            }
-            else {
-                return ResponseEntity.badRequest().build();
-            }
-        } else {
+        if(id.equals(resource.getId())){
+            ClientResource clientResource = mapper.toResource(
+            clientService.updatePlan(mapper.toModel(resource), planId, clientService.existPlanByPlanId(resource.getGivenPlan())));
+            return new ResponseEntity<>(clientResource, HttpStatus.OK);
+        }
+        else {
             return ResponseEntity.badRequest().build();
         }
-
-    }
-    @Operation(summary = "Fetch all class by client", responses = {
-            @ApiResponse(description = "Client's classes successfully displayed",
-                    responseCode = "201",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClientResource.class)))
-    })
-    @GetMapping("{id}/classes")
-    public List<Optional<?>> fetchClientClass(@PathVariable Integer id) {
-        return clientService.fetchClientClass(id);
     }
 
-
-    @Operation(summary = "Join the class", responses = {
-            @ApiResponse(description = "Join successfully created",
-                    responseCode = "201",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClientResource.class)))
-    })
-    @PostMapping("{id}/join-class")
-    public Optional<?> joinClass(@PathVariable Integer id, @RequestBody ClientClassResource classId) {
-        return clientService.joinClass(id, classId.getClassId());
-    }
-
-    @Operation(summary = "Join the class", responses = {
-            @ApiResponse(description = "Join successfully created",
-                    responseCode = "201",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClientResource.class)))
-    })
-    @PostMapping("{id}/exit-class")
-    public Optional<?> exitClass(@PathVariable Integer id, @RequestBody ClientClassResource classId) {
-        return clientService.exitClass(id, classId.getClassId());
-    }
-
-    @Operation(summary = "update the limit for class departures", responses = {
-            @ApiResponse(description = "Limit successfully updated",
-                    responseCode = "201",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClientResource.class)))
-    })
-    @PostMapping("update-exit-class")
-    public Optional<?> updateAllClassExits(@RequestBody UpdateClassExitsClient exitsClient) {
-        return clientService.updateAllClassExits(exitsClient.getClassExits());
-    }
-
-    @Operation(summary = "update the class status", responses = {
-            @ApiResponse(description = "Status successfully updated",
-                    responseCode = "201",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClientResource.class)))
-    })
-    @PostMapping("/{id}/update-status-class")
-    public Optional<?> updateClassStatus(@PathVariable Integer id, @RequestBody ClientClassResource classResource) {
-        return clientService.updateClassStatus(clientService.fetchById(id).get(), classResource.getClassId());
-    }
 
 
 

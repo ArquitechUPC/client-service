@@ -7,7 +7,6 @@ import java.util.Optional;
 
 public interface GoalService {
     List<Goal> fetchAll();
-    List<Goal> fetchByClient(Integer givenClientId);
     Optional<Goal> fetchById(Integer Id);
     Goal save(Goal goal, Integer givenClientId);
     Goal update(Goal goal);
