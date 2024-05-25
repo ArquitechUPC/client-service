@@ -7,8 +7,8 @@ import lombok.*;
 @With
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientResource {
-    private Integer id;
-    private Integer givenUser;
-    private Integer givenPlan;
+public class ClientClassDetailResource {
+    private Integer clientId;
+    private Integer classId;
+    private Boolean status;
 }

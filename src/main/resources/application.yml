@@ -1,10 +1,5 @@
 spring:
   application:
     name: client-service
-
   config:
     import: optional:configserver:http://localhost:8888
-
-stripe:
-  secret:
-    key: sk_test_51PINDiP8n6bq8qJSAJXSUsC0zGkO6XsW5JfweilN2PBwJa3sZmJMkMGpLXfAgBKhfCHEcsKehWS3llLZexumOKt900rPDQzUbp

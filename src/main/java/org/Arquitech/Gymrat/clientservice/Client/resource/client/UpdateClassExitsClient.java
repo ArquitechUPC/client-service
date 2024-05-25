@@ -7,8 +7,6 @@ import lombok.*;
 @With
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientResource {
-    private Integer id;
-    private Integer givenUser;
-    private Integer givenPlan;
+public class UpdateClassExitsClient {
+    Integer classExits;
 }

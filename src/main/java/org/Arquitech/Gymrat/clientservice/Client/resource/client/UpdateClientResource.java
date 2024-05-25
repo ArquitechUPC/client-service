@@ -11,10 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateClientResource {
-    @NotNull
+    /*@NotNull
     @NotBlank
     @Min(1)
-    private Integer id;
+    private Integer id;*/
 
     @NotNull
     @NotBlank
@@ -23,6 +23,4 @@ public class UpdateClientResource {
     @NotNull
     @NotBlank
     private Integer givenPlan;
-
-    private String givenStripeCardToken;
 }

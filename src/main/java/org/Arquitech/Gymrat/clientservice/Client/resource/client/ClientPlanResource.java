@@ -1,6 +1,5 @@
 package org.Arquitech.Gymrat.clientservice.Client.resource.client;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -8,11 +7,6 @@ import lombok.*;
 @With
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateClientResource {
-    @NotNull
-    private Integer givenUser;
-
-    @NotNull
+public class ClientPlanResource {
     private Integer givenPlan;
-
 }

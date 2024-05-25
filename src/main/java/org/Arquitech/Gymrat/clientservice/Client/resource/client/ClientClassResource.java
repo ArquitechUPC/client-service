@@ -8,11 +8,7 @@ import lombok.*;
 @With
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateClientResource {
+public class ClientClassResource {
     @NotNull
-    private Integer givenUser;
-
-    @NotNull
-    private Integer givenPlan;
-
+    private Integer classId;
 }
