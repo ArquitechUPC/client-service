@@ -67,12 +67,16 @@ public class MeasurementServiceImpl implements MeasurementService {
             throw new CustomException("Error", HttpStatus.NOT_FOUND);
         }
 
+
         Client client = clientRepository.findById(givenClientId)
                 .orElseThrow(() -> new CustomException("Client not found", HttpStatus.NOT_FOUND));
-        client.getMeasurements().add(measurement);
+
+        Measurement savedMeasurement = measurementRepository.save(measurement);
+
+        client.getMeasurements().add(savedMeasurement);
         clientRepository.save(client);
 
-        return measurementRepository.save(measurement);
+        return savedMeasurement;
     }
 
     @Override
@@ -85,13 +89,28 @@ public class MeasurementServiceImpl implements MeasurementService {
         return measurementRepository
                 .findById(measurement.getId())
                 .map(updatedMeasurement -> {
-                    updatedMeasurement.setWeight(measurement.getWeight());
-                    updatedMeasurement.setComment(measurement.getComment());
-                    updatedMeasurement.setChestCircumference(measurement.getChestCircumference());
-                    updatedMeasurement.setArmCircumference(measurement.getArmCircumference());
-                    updatedMeasurement.setHipCircumference(measurement.getHipCircumference());
-                    updatedMeasurement.setLegCircumference(measurement.getLegCircumference());
-                    updatedMeasurement.setWaistCircumference(measurement.getWaistCircumference());
+                    if (measurement.getWeight()!=null){
+                        updatedMeasurement.setWeight(measurement.getWeight());
+                    }
+                    if (measurement.getComment() != null) {
+                        updatedMeasurement.setComment(measurement.getComment());
+                    }
+                    if (measurement.getChestCircumference() != null) {
+                        updatedMeasurement.setChestCircumference(measurement.getChestCircumference());
+                    }
+                    if (measurement.getArmCircumference() != null) {
+                        updatedMeasurement.setArmCircumference(measurement.getArmCircumference());
+                    }
+                    if (measurement.getHipCircumference() != null) {
+                        updatedMeasurement.setHipCircumference(measurement.getHipCircumference());
+                    }
+                    if (measurement.getLegCircumference() != null) {
+                        updatedMeasurement.setLegCircumference(measurement.getLegCircumference());
+                    }
+                    if (measurement.getWaistCircumference() != null) {
+                        updatedMeasurement.setWaistCircumference(measurement.getWaistCircumference());
+                    }
+
                     return measurementRepository.save(updatedMeasurement);
                 })
                 .orElseThrow(() -> new CustomException("Measurement not found", HttpStatus.NOT_FOUND));

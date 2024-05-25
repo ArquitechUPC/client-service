@@ -48,6 +48,14 @@ public class GoalServiceImpl implements GoalService {
         return goalRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<Goal> fetchByClient(Integer givenClientId) {
+        return clientRepository.findById(givenClientId)
+                .map(Client::getGoals)
+                .orElseThrow(() -> new CustomException("Client not found", HttpStatus.NOT_FOUND));
+    }
+
 
     @Transactional(readOnly = true)
     @Override
@@ -68,9 +76,10 @@ public class GoalServiceImpl implements GoalService {
 
         Client client = clientRepository.findById(givenClientId)
                 .orElseThrow(()-> new CustomException("Client not found", HttpStatus.NOT_FOUND));
+        Goal savedGoal = goalRepository.save(goal);
          client.getGoals().add(goal);
          clientRepository.save(client);
-         return goalRepository.save(goal);
+         return savedGoal;
     }
 
     @Override
@@ -82,9 +91,15 @@ public class GoalServiceImpl implements GoalService {
 
         return goalRepository.findById(goal.getId())
                 .map(goalToUpdate ->{
-                    goalToUpdate.setName(goal.getName());
-                    goalToUpdate.setDescription(goal.getDescription());
-                    goalToUpdate.setEndDate(goal.getEndDate());
+                    if (goal.getName()!=null){
+                        goalToUpdate.setName(goal.getName());
+                    }
+                    if(goal.getDescription()!=null){
+                        goalToUpdate.setDescription(goal.getDescription());
+                    }
+                    if(goal.getEndDate()!=null){
+                        goalToUpdate.setEndDate(goal.getEndDate());
+                    }
 
                     return goalRepository.save(goalToUpdate);
                 })
