@@ -1,18 +1,32 @@
 package org.Arquitech.Gymrat.clientservice.Client.api.rest;
 
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Token;
+import com.stripe.param.TokenCreateParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.PostConstruct;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.Value;
 import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Client;
+import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Goal;
+import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Measurement;
 import org.Arquitech.Gymrat.clientservice.Client.domain.service.ClientService;
 import org.Arquitech.Gymrat.clientservice.Client.mapping.ClientMapper;
+import org.Arquitech.Gymrat.clientservice.Client.resource.card.CardRequest;
 import org.Arquitech.Gymrat.clientservice.Client.resource.client.ClientResource;
 import org.Arquitech.Gymrat.clientservice.Client.resource.client.CreateClientResource;
 import org.Arquitech.Gymrat.clientservice.Client.resource.client.UpdateClientResource;
+import org.Arquitech.Gymrat.clientservice.Client.resource.invoice.InvoiceResource;
+import org.Arquitech.Gymrat.clientservice.Client.resource.measurement.MeasurementResource;
 import org.Arquitech.Gymrat.clientservice.Shared.exception.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -67,6 +81,8 @@ public class ClientController {
         return this.mapper.toResource(clientService.save(this.mapper.toModel(resource)));
     }
 
+
+
     @Operation(summary = "Update a client's plan", responses = {
             @ApiResponse(description = "Client's plan successfully updated",
                     responseCode = "201",
@@ -86,7 +102,51 @@ public class ClientController {
         }
     }
 
+    @PostMapping("/{clientId}/card")
+    public ResponseEntity<String> addCard(@PathVariable Integer clientId, @RequestBody CardRequest cardRequest) {
+        try {
+            TokenCreateParams params =
+                    TokenCreateParams.builder()
+                            .setCard(
+                                    TokenCreateParams.Card.builder()
+                                            .setNumber(cardRequest.getCardNumber())
+                                            .setExpMonth(String.valueOf(cardRequest.getExpiryMonth()))
+                                            .setExpYear(String.valueOf(cardRequest.getExpiryYear()))
+                                            .setCvc(cardRequest.getCvc())
+                                            .build())
+                            .build();
+
+            Token token = Token.create(params);
+
+            Client client = clientService.fetchById(clientId).orElseThrow(() -> new NotFoundException("Client not found"));
+            client.setStripeCardToken(token.getId());
+            clientService.update(client);
+
+            return ResponseEntity.ok("Card added successfully");
+        } catch (StripeException e) {
+            throw new BadRequestException("Error adding card: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{clientId}/invoices")
+    public ResponseEntity<List<InvoiceResource>> getInvoicesByClientId(@PathVariable Integer clientId) {
+        return ResponseEntity.ok(clientService.getInvoicesByClientId(clientId));
+    }
+
+    @PostMapping("/measurements")
+    public ResponseEntity<MeasurementResource> saveMeasurement(@RequestBody MeasurementResource measurementResource) {
+        Measurement measurement = clientService.saveMeasurement(measurementResource);
 
 
+        Integer userId = measurement.getClient().getId();
+
+
+        Goal goal = measurement.getGoal();
+
+
+        clientService.sendProgressNotification(userId, goal, measurement);
+
+        return ResponseEntity.ok(measurementResource);
+    }
 
 }

@@ -5,10 +5,16 @@ import jakarta.validation.Validator;
 import org.Arquitech.Gymrat.clientservice.Client.client.PlanClient;
 import org.Arquitech.Gymrat.clientservice.Client.client.UserClient;
 import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Client;
+import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Goal;
+import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Measurement;
 import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.ClientRepository;
 import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.GoalRepository;
 import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.MeasurementRepository;
 import org.Arquitech.Gymrat.clientservice.Client.domain.service.ClientService;
+import org.Arquitech.Gymrat.clientservice.Client.mapping.ClientMapper;
+import org.Arquitech.Gymrat.clientservice.Client.resource.admin.AdminServiceClient;
+import org.Arquitech.Gymrat.clientservice.Client.resource.invoice.InvoiceResource;
+import org.Arquitech.Gymrat.clientservice.Client.resource.measurement.MeasurementResource;
 import org.Arquitech.Gymrat.clientservice.Shared.exception.CustomException;
 
 
@@ -16,8 +22,7 @@ import org.Arquitech.Gymrat.clientservice.Shared.exception.CustomException;
 //import org.Arquitech.Gymrat.Authentication.domain.persistence.UserRepository;
 //import org.Arquitech.Gymrat.clientservice.Client.domain.model.entity.Plan;
 //import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.PlanRepository;
-import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.ClientRepository;
-import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.GoalRepository;
+
 
 
 
@@ -36,6 +41,9 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private ClientMapper mapper;
+
     //@Autowired
     //private UserRepository userRepository;
     @Autowired
@@ -49,6 +57,9 @@ public class ClientServiceImpl implements ClientService {
 
     //@Autowired
     //private PlanRepository planRepository;
+
+    @Autowired
+    private AdminServiceClient adminServiceClient;
 
     @Autowired
     private MeasurementRepository measurementRepository;
@@ -78,7 +89,7 @@ public class ClientServiceImpl implements ClientService {
         if (clientRepository.existsById(Id)) {
             return clientRepository.findById(Id);
         } else {
-            throw new CustomException("El cliente no existe",HttpStatus.NOT_FOUND);
+            throw new CustomException("El cliente no existe", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -105,8 +116,7 @@ public class ClientServiceImpl implements ClientService {
         if (existPlan) {
             client.setGivenPlan(planId);
             return clientRepository.save(client);
-        }
-        else {
+        } else {
             throw new CustomException("Plan not found", HttpStatus.NOT_FOUND);
         }
 
@@ -115,10 +125,19 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean deleteById(Integer id) {
-        var clientToDelete = clientRepository.findById(id).orElseThrow(() -> new CustomException("Error",HttpStatus.NOT_FOUND));
+        var clientToDelete = clientRepository.findById(id).orElseThrow(() -> new CustomException("Error", HttpStatus.NOT_FOUND));
 
         clientRepository.delete(clientToDelete);
         return true;
+    }
+
+    @Override
+    public Client update(Client client) {
+        Set<ConstraintViolation<Client>> violations = validator.validate(client);
+        if (!violations.isEmpty()) {
+            throw new CustomException("Error validating client data", HttpStatus.BAD_REQUEST);
+        }
+        return clientRepository.save(client);
     }
 
     @Override
@@ -131,5 +150,31 @@ public class ClientServiceImpl implements ClientService {
         return planClient.existPlanById(id);
     }
 
+    @Override
+    public List<InvoiceResource> getInvoicesByClientId(Integer clientId) {
+        return adminServiceClient.getInvoicesByClientId(clientId);
+    }
+
+    @Override
+    public Measurement saveMeasurement(MeasurementResource measurementResource) {
+
+        Measurement measurement = mapper.toModel(measurementResource);
+
+
+        return measurementRepository.save(measurement);
+    }
+
+
+    @Override
+    public void sendProgressNotification(Integer userId, Goal goal, Measurement latestMeasurement) {
+        if (goal.getNotificationEnabled()) {
+            double progressPercentage = (latestMeasurement.getValue() / goal.getTargetValue()) * 100;
+
+            if (progressPercentage >= 50 && goal.getProgressNotificationSent() == false) {
+                goal.setProgressNotificationSent(true);
+                goalRepository.save(goal);
+            }
+        }
+    }
 
 }

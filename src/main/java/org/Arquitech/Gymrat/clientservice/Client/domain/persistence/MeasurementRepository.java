@@ -6,8 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MeasurementRepository extends JpaRepository<Measurement, Integer> {
     List<Measurement> findByDate(LocalDate date);
+    Optional<Measurement> findTop1ByUserIdAndTypeOrderByDateDesc(Integer userId, String type);
 }

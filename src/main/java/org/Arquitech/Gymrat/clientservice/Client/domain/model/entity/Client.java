@@ -23,6 +23,9 @@ public class Client {
     @NotNull
     private Integer givenPlan;
 
+
+    private String stripeCardToken;
+
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
     private List<Goal> goals;

@@ -23,4 +23,6 @@ public class UpdateClientResource {
     @NotNull
     @NotBlank
     private Integer givenPlan;
+
+    private String givenStripeCardToken;
 }

@@ -39,6 +39,16 @@ public class Measurement {
     @Column(name = "leg_circumference")
     private Double legCircumference;
 
+    @Column(nullable = false)
+    private Double value;
+
+    @ManyToOne
+    private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "goal_id")
+    private Goal goal;
+
     @PrePersist
     public void prePersist() {
         date = LocalDate.now();

@@ -41,4 +41,12 @@ public class Goal {
     @JoinColumn(name = "measurement_id")
     private Measurement measurementGoal;
 
+    @Column(nullable = false)
+    private Boolean notificationEnabled;
+
+    @Column(nullable = false)
+    private Double targetValue;
+
+    @Column(nullable = false)
+    private Boolean progressNotificationSent = false;
 }
