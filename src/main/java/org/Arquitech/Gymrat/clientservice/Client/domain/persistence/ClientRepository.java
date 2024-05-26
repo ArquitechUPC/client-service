@@ -29,7 +29,6 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
     @Query(value = "SELECT status FROM client_classes WHERE client_id = :clientId AND class_id = :classId", nativeQuery = true)
     boolean verifyClientClassStatus(@Param("clientId") Integer clientId, @Param("classId") Integer classId);
 
-    List<Client> findByCompanyId(Integer companyId);
 }
 
 

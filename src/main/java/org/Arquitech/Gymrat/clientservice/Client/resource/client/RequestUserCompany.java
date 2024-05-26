@@ -8,9 +8,7 @@ import lombok.*;
 @With
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateClientUserResource {
-
-
+public class RequestUserCompany {
     @NotNull
     String username;
     @NotNull
@@ -20,4 +18,6 @@ public class CreateClientUserResource {
     String phoneNumber;
     String address;
     String city;
+    @NotNull
+    Integer companyId;
 }

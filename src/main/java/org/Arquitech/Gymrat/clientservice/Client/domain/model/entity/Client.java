@@ -45,7 +45,7 @@ public class Client {
     @Column(name = "status")
     private Set<Boolean> status = new HashSet<>();
 
-    @NotNull
-    @Column(name = "company_id")
-    private Integer companyId;
+//    @NotNull
+//    @Column(name = "company_id")
+//    private Integer companyId;
 }

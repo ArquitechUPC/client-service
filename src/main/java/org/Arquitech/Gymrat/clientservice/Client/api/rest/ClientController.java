@@ -50,34 +50,19 @@ public class ClientController {
         return this.mapper.toResource(clientService.fetchById(id).get());
     }
 
-    //fetchByCompanyId
-    @Operation(summary = "Get all clients by CompanyId", responses = {
-            @ApiResponse(description = "Successfully fetched all clients by CompanyId",
-                    responseCode = "201",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClientResource.class)))
-    })
-    @GetMapping("/company/{companyId}")
-    public List<Client> fetchByCompanyId(@PathVariable Integer companyId) {
-        return clientService.fetchByCompanyId(companyId);
-    }
-
     @Operation(summary = "Save a client", responses = {
             @ApiResponse(description = "Client successfully created",
                     responseCode = "201",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ClientResource.class)))
     })
-    @PostMapping
-    public ClientResource save(@RequestBody CreateClientUserResource resource){
+    @PostMapping("/company/{companyId}")
+    public ClientResource save(@RequestBody CreateClientUserResource resource, @PathVariable Integer companyId){
 
-        /*if (!clientService.existUserByUserId((mapper.toModel(resource)))) {
-            throw new IllegalArgumentException("User does not exist");
-        }*/
         CreateClientResource clientResource = new CreateClientResource();
         clientResource.setGivenUser(clientService.obtainUserId(
-                resource.getUsername(), resource.getEmail(), resource.getPassword(), resource.getGymName(),
-                resource.getPhoneNumber(), resource.getAddress(), resource.getCity()));
+                resource.getUsername(), resource.getEmail(), resource.getPassword(),
+                resource.getPhoneNumber(), resource.getAddress(), resource.getCity(), companyId));
         /*if(givenPlan!=null){
 
         } else {*/

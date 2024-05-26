@@ -11,6 +11,7 @@ import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.GoalReposito
 import org.Arquitech.Gymrat.clientservice.Client.domain.persistence.MeasurementRepository;
 import org.Arquitech.Gymrat.clientservice.Client.domain.service.ClientService;
 import org.Arquitech.Gymrat.clientservice.Client.resource.client.CreateClientUserResource;
+import org.Arquitech.Gymrat.clientservice.Client.resource.client.RequestUserCompany;
 import org.Arquitech.Gymrat.clientservice.Shared.exception.CustomException;
 
 
@@ -85,10 +86,6 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-    @Override
-    public List<Client> fetchByCompanyId(Integer id) {
-        return clientRepository.findByCompanyId(id);
-    }
 
     @Override
     public Client save(Client client) {
@@ -98,7 +95,7 @@ public class ClientServiceImpl implements ClientService {
         }*/
         client.setClassExits(2);  //aqui debe consumir del microservicio del admin un valor de la tabla admin
 
-        client.setCompanyId(1); //Aquí debe consultar el microservicio de administración para obtener el valor de la tabla 'admin' que retorne el ID de la compañía asociada al administrador
+       // client.setCompanyId(1); //Aquí debe consultar el microservicio de administración para obtener el valor de la tabla 'admin' que retorne el ID de la compañía asociada al administrador
 
         return clientRepository.save(client);
     }
@@ -167,15 +164,15 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Integer obtainUserId(String username, String email, String password, String gymName, String phoneNumber, String address, String city) {
-        CreateClientUserResource request = new CreateClientUserResource();
+    public Integer obtainUserId(String username, String email, String password, String phoneNumber, String address, String city, Integer companyId) {
+        RequestUserCompany request = new RequestUserCompany();
         request.setUsername(username);
         request.setEmail(email);
         request.setPassword(password);
-        request.setGymName(gymName);
         request.setPhoneNumber(phoneNumber);
         request.setAddress(address);
         request.setCity(city);
+        request.setCompanyId(companyId);
 
 
         return userClient.ObtainUserId(request);

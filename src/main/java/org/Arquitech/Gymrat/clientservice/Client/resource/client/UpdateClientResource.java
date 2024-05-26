@@ -11,10 +11,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateClientResource {
-    /*@NotNull
-    @NotBlank
-    @Min(1)
-    private Integer id;*/
 
     @NotNull
     @NotBlank

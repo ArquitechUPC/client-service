@@ -8,7 +8,6 @@ import java.util.Optional;
 public interface ClientService {
     List<Client>fetchAll();
     Optional<Client> fetchById(Integer Id);
-    List<Client> fetchByCompanyId(Integer id);
     Client save(Client client);
     Client updatePlan(Client client, Integer planId);
     Optional<List<Client>> updateAllClassExits(Integer newClassExits);
@@ -18,6 +17,6 @@ public interface ClientService {
     Optional<?> exitClass(Integer id, Integer classId);
     boolean deleteById(Integer id);
     boolean existUserByUserId(Client client);
-    Integer obtainUserId(String username, String email, String password, String gymName, String phoneNumber, String address, String city);
+    Integer obtainUserId(String username, String email, String password, String phoneNumber, String address, String city, Integer companyId);
     boolean existPlanByPlanId(Integer id);
 }
